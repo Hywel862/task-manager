@@ -78,5 +78,3 @@ The goal of this task was to build a full-stack-ready backend application with:
 3. Visit `http://localhost:8080/api/tasks` or run tests via your IDE or `mvn test`
 
 ---
-
-Let me know if you'd like a version with Swagger UI instructions or frontend integration.
