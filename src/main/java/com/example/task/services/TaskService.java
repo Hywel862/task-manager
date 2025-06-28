@@ -5,6 +5,7 @@ import com.example.task.models.SearchRequest;
 import com.example.task.models.Task;
 import com.example.task.repository.TaskRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,8 +19,9 @@ public class TaskService {
     @Autowired
     TaskRepository repository;
 
-    public void create(Task task) {
-        repository.save(task);
+    public Task create(Task task) {
+        task.setCreated(LocalDateTime.now());
+        return repository.save(task);
     }
 
     public ResponseEntity<List<Task>> getAllTasks() {
@@ -27,7 +29,7 @@ public class TaskService {
         if (tasks.isEmpty()) {
             throw new TaskNotFoundException("No tasks found");
         }
-        return ResponseEntity.ok().body(repository.findAll());
+        return ResponseEntity.ok().body(tasks);
     }
 
     public ResponseEntity<Task> getSpecificTask(Long id) {
@@ -39,23 +41,23 @@ public class TaskService {
         }
     }
 
-    public ResponseEntity<String> update(String id, Task task) {
-        Optional<Task> taskOptional =  repository.findById(Long.valueOf(id))
-                         .map(updatedTask -> {
-                             updatedTask.setDescription(task.getDescription());
-                             updatedTask.setTitle(task.getTitle());
-                             return repository.save(updatedTask);
-                         });
-        if (taskOptional.isPresent()) {
-            return ResponseEntity.ok().body("Update was successful");
-        }
-        throw new TaskNotFoundException(String.format(NO_TASKS_FOUND, id));
+    public ResponseEntity<String> update(Long id, Task task) {
+        repository.findById(id)
+                  .ifPresentOrElse(existingTask -> {
+                      existingTask.setTitle(task.getTitle());
+                      existingTask.setDescription(task.getDescription());
+                      existingTask.setUpdated(LocalDateTime.now());
+                      repository.save(existingTask);
+                  }, () -> {
+                      throw new TaskNotFoundException(String.format(NO_TASKS_FOUND, id));
+                  });
+        return ResponseEntity.ok().body("Update was successful");
     }
 
-    public ResponseEntity<String> deleteTask(String id) {
-        Optional<Task> task = repository.findById(Long.valueOf(id));
+    public ResponseEntity<String> deleteTask(Long id) {
+        Optional<Task> task = repository.findById(id);
         if (task.isPresent()) {
-            repository.deleteById(Long.valueOf(id));
+            repository.deleteById(id);
             return ResponseEntity.ok("Task deleted successfully");
         }
         throw new TaskNotFoundException(String.format(NO_TASKS_FOUND, id));
@@ -63,11 +65,11 @@ public class TaskService {
 
     public ResponseEntity<List<Task>> search(SearchRequest request) {
         List<Task> tasks = repository.findAll();
-        if (tasks.isEmpty()) {
+        String phrase = request.getPhrase();
+        List<Task> retrievedTasks = tasks.stream().filter(task -> task.getTitle().contains(phrase)).toList();
+        if (retrievedTasks.isEmpty()) {
             throw new TaskNotFoundException(String.format(String.format("No tasks found with phrase: %s", request.getPhrase())));
         }
-        request.setPhrase(request.getPhrase().toLowerCase());
-        tasks.removeIf(task -> !task.getTitle().toLowerCase().contains(request.getPhrase()));
-        return ResponseEntity.ok().body(tasks);
+        return ResponseEntity.ok().body(retrievedTasks);
     }
 }

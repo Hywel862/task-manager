@@ -5,8 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
 @SpringBootApplication
-public class TaskProject {
+public class TaskManagerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(TaskProject.class, args);
+        SpringApplication.run(TaskManagerApplication.class, args);
     }
 }
