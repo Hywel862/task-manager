@@ -15,8 +15,6 @@ The goal of this task was to build a full-stack-ready backend application with:
 * Custom exception handling using `@ControllerAdvice`.
 * Basic input validation using Jakarta Bean Validation (`@NotBlank`, etc.).
 * Unit tests using JUnit, Mockito, and Spring’s testing support.
-* Swagger integration for API documentation (if desired/extended).
-* (Optional) Setup for a frontend (HTML/JS) or future API consumers.
 
 ---
 
