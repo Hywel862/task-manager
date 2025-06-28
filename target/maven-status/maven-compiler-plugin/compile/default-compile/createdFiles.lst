@@ -1,4 +1,0 @@
-controllers/TaskController.class
-models/Task.class
-repository/TaskRepository.class
-services/TaskService.class
