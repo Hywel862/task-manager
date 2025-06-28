@@ -1,6 +1,3 @@
-Here’s a README file describing your project and task in a clear and professional way:
-
----
 
 ## 📋 Task Management API
 
